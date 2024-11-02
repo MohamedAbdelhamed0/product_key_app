@@ -13,11 +13,19 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Enter Product Key')),
+      appBar: AppBar(
+        title: const Text('Enter Product Key'),
+        actions: [
+          IconButton(
+              onPressed: () =>
+                  Navigator.pushReplacementNamed(context, '/admin'),
+              icon: const Icon(Icons.logout))
+        ],
+      ),
       body: BlocListener<ProductKeyCubit, ProductKeyState>(
         listener: (context, state) {
           if (state is ProductKeyValid) {
-            Navigator.pushNamed(context, '/admin');
+            Navigator.pushReplacementNamed(context, '/home');
           } else if (state is ProductKeyInvalid) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Product key not valid')),

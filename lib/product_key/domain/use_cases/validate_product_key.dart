@@ -5,7 +5,7 @@ class ValidateProductKey {
 
   ValidateProductKey(this.repository);
 
-  Future<bool> call(String key) {
-    return repository.validateProductKey(key);
+  Future<bool> call(String key, String deviceId) {
+    return repository.validateProductKey(key, deviceId);
   }
 }

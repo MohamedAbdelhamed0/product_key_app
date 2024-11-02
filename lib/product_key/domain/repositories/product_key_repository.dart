@@ -1,7 +1,7 @@
 import '../entities/product_key.dart';
 
 abstract class ProductKeyRepository {
-  Future<bool> validateProductKey(String key);
+  Future<bool> validateProductKey(String key, String deviceId);
   Future<void> assignProductKey(String key, String name, String phone);
   Future<List<ProductKey>> getAllProductKeys();
   Future<void> generateProductKey(String key);

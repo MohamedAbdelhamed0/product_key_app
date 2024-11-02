@@ -6,18 +6,25 @@ import 'package:product_key_app/product_key/data/repositories/product_key_reposi
 import 'package:product_key_app/product_key/domain/use_cases/AssignProductKey.dart';
 import 'package:product_key_app/product_key/domain/use_cases/validate_product_key.dart';
 import 'package:product_key_app/product_key/presentation/manager/product_key_cubit.dart';
+import 'package:product_key_app/product_key/presentation/pages/CacheHelper.dart';
+import 'package:product_key_app/product_key/presentation/pages/HomePage.dart';
+import 'package:product_key_app/product_key/presentation/pages/SplashScreen.dart';
 import 'package:product_key_app/product_key/presentation/pages/admin_page.dart';
 import 'package:product_key_app/product_key/presentation/pages/login_page.dart';
 
-import 'firebase_options.dart';
+import 'firebase_options.dart'; // Import the generated file
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await CacheHelper.init();
+
   final firestore = FirebaseFirestore.instance;
   final repository = ProductKeyRepositoryImpl(firestore);
+
   runApp(MyApp(repository: repository));
 }
 
@@ -31,13 +38,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Product Key App',
       routes: {
-        '/': (context) => BlocProvider(
+        '/': (context) => SplashScreen(repository: repository),
+        '/login': (context) => BlocProvider(
               create: (context) => ProductKeyCubit(
                 validateProductKey: ValidateProductKey(repository),
                 assignProductKey: AssignProductKey(repository),
               ),
               child: LoginPage(),
             ),
+        '/home': (context) => HomePage(),
         '/admin': (context) => AdminPage(),
       },
       initialRoute: '/',

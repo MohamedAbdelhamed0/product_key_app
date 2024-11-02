@@ -1,20 +1,87 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AdminPage extends StatelessWidget {
+class AdminPage extends StatefulWidget {
   AdminPage({super.key});
 
+  @override
+  _AdminPageState createState() => _AdminPageState();
+}
+
+class _AdminPageState extends State<AdminPage> {
   final TextEditingController newKeyController = TextEditingController();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  void generateProductKey(BuildContext context) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showPasswordDialog());
+  }
+
+  void _showPasswordDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        String enteredPassword = '';
+        return BackdropFilter(
+          filter: new ImageFilter.blur(sigmaX: 50.0, sigmaY: 50.0),
+          child: AlertDialog(
+            title: const Text('Admin Login'),
+            content: TextField(
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Enter Password'),
+              onChanged: (value) {
+                enteredPassword = value;
+              },
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+              ),
+              TextButton(
+                child: const Text('Submit'),
+                onPressed: () {
+                  _validatePassword(enteredPassword);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _validatePassword(String password) {
+    const adminPassword =
+        'YourSecurePassword'; // Replace with your actual password
+
+    if (password == adminPassword) {
+      Navigator.of(context).pop(); // Close the dialog
+      // Access granted
+    } else {
+      Navigator.of(context).pop(); // Close the dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Incorrect password')),
+      );
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
+
+  Future<void> generateProductKey(BuildContext context) async {
     final key = newKeyController.text.trim();
     if (key.isNotEmpty) {
       firestore.collection('product_keys').doc(key).set({
         'key': key,
         'assignedTo': null,
         'phoneNumber': null,
-        // Add other fields as needed
+        'deviceId': null,
       });
       newKeyController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
